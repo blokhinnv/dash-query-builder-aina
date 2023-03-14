@@ -37,13 +37,13 @@ class OpNode:
             n_uuid = len(self.operands)
             return n_uuid
 
-    def generate_uuids(self) -> list[str]:
+    def generate_uuids(self) -> list:
         """
         Generate unique strings.
 
         Returns
         -------
-        list[str]
+        list
             A single shortened UUID or a list of shortened UUIDs.
         """
         number_of_uuid = self.get_num_uuid()
