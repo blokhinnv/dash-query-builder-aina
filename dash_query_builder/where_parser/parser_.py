@@ -100,7 +100,7 @@ class WhereParser:
 
     def generate_template(
         self, str_to_parse: str
-    ) -> tuple[str, dict[str, str | int | float | bool]]:
+    ) -> tuple:
         """
         Generate the template string and values of a given WHERE string.
 
