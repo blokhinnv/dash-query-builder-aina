@@ -20,6 +20,16 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md)
     $ poetry install
     ```
 
+3. All together
+    ```
+    npm i -g pnpm
+    pnpm install
+    poetry install
+    poetry lock
+    poetry install
+    poetry run npm run build && poetry run python usage.py
+    ```
+
 ### Write your component code in `src/lib/components/DashQueryBuilder.react.js`.
 
 - Test your code in a Python environment:
