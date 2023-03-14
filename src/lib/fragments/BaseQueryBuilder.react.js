@@ -39,8 +39,10 @@ export default class BaseQueryBuilder extends Component {
             this.setProps({ loadFormat: 'tree' })
         }
         let initialLoadItem = this.getLoadItem(loadFormat, props);
-        let initialImmutableTree = checkTree(this.loadModifiedTree(props.loadFormat, initialLoadItem, config), config);
-
+        let initialImmutableTree = checkTree(
+            this.loadModifiedTree(props.loadFormat, initialLoadItem, config),
+            config
+        );
 
         this.state = {
             config: config,
@@ -95,7 +97,7 @@ export default class BaseQueryBuilder extends Component {
 
             case 'tree':
             default:
-                return loadTree(modifiedValue, config);
+                return loadTree(modifiedValue || emptyTree, config);
         }
 
     }
@@ -106,37 +108,6 @@ export default class BaseQueryBuilder extends Component {
      * the layout properly. Only run once and only if one of the props has changed.
      */
     componentDidUpdate(prevProps) {
-        let modified = false
-        let modifiedProp
-        let modifiedValue
-        if (prevProps.tree !== this.props.tree && this.props.loadFormat === 'tree') {
-            //what happens if this.props.tree is null?
-            modified = true;
-            modifiedProp = 'tree';
-            modifiedValue = this.props.tree;
-
-        }
-        else if (this.props.loadFormat === 'spelFormat' && prevProps.spelFormat !== this.props.spelFormat) {
-            modified = true;
-            modifiedProp = 'spelFormat';
-            modifiedValue = this.props.spelFormat;
-
-        }
-        else
-            if (this.props.loadFormat === 'jsonLogicFormat' && prevProps.jsonLogicFormat !== this.props.jsonLogicFormat) {
-                modified = true;
-                modifiedProp = 'jsonLogicFormat';
-                modifiedValue = this.props.jsonLogicFormat.logic;
-            }
-        if (modified) {
-            let immutableTree = this.loadModifiedTree(modifiedProp, modifiedValue);
-            let currentState = this.getCurrentStateFromTree(
-                immutableTree,
-                this.state.config
-            );
-            this.setState({ immutableTree: immutableTree });
-            this.setProps(currentState)
-        }
         if (prevProps.loadFormat !== this.props.loadFormat) {
             this.setProps({ loadFormat: this.props.loadFormat })
             this.setState({ loadFormat: this.props.loadFormat })
@@ -144,6 +115,15 @@ export default class BaseQueryBuilder extends Component {
         if (prevProps.alwaysShowActionButtons !== this.props.alwaysShowActionButtons) {
             this.setProps({ alwaysShowActionButtons: this.props.alwaysShowActionButtons })
             this.setState({ alwaysShowActionButtons: this.props.alwaysShowActionButtons })
+        }
+        if (prevProps.fields !== this.props.fields) {
+            console.log("FIELDS CHANGED", prevProps.fields, this.props.fields, this.state)
+            console.log('this', this)
+            this.setProps({ fields: this.props.fields })
+            let state = {...this.state}
+            state.config.fields = this.props.fields
+            this.setState({ config: state.config });
+
         }
     }
     /**
@@ -190,7 +170,7 @@ export default class BaseQueryBuilder extends Component {
             <div>
                 <Query
                     {...this.state.config}
-                    value={this.state.immutableTree}
+                    value={this.state.immutableTree || emptyTree}
                     onChange={this.onChange}
                     renderBuilder={this.renderBuilder}
                 />

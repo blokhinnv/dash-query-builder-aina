@@ -119,7 +119,7 @@ app.layout = html.Div(
         dash_query_builder.DashQueryBuilder(
             id="input",
             fields=fields["fields"],
-            theme="mui",
+            theme="bootstrap",
             alwaysShowActionButtons=True,
             tree=None,
             loadFormat="tree",
@@ -137,6 +137,7 @@ app.layout = html.Div(
         html.Button(id="update-format-tree", children="Load Tree"),
         html.Button(id="update-format-json", children="Load JSONLogic"),
         html.Button(id="update-format-spel", children="Load SPEL"),
+        html.Button(id="update-fields", children="update fields"),
     ]
 )
 
@@ -148,6 +149,7 @@ app.layout = html.Div(
         Input("update-format-json", "n_clicks"),
         Input("update-format-spel", "n_clicks"),
     ],
+    prevent_initial_call=True,
 )
 def update_load_format(n_clicks_tree, n_clicks_json, n_clicks_spel):
     if not callback_context.triggered:
@@ -170,6 +172,7 @@ def update_load_format(n_clicks_tree, n_clicks_json, n_clicks_spel):
         State("input", "jsonLogicFormat"),
         State("input", "spelFormat"),
     ],
+    prevent_initial_call=True,
 )
 def display_output(tree_value, sqlFormat, jsonLogicFormat, spelFormat):
     output = html.Div(
@@ -193,7 +196,7 @@ def display_output(tree_value, sqlFormat, jsonLogicFormat, spelFormat):
 @app.callback(
     Output("input", "tree"),
     Input("update-button", "n_clicks"),
-    # prevent_initial_call=True,
+    prevent_initial_call=True,
 )
 def update_tree_value(n):
     if n is not None and n % 2 == 1:
@@ -202,6 +205,30 @@ def update_tree_value(n):
         rv = empty_
 
     return rv
+
+@app.callback(
+    Output("input", "fields"),
+    Input("update-fields", "n_clicks"),
+    prevent_initial_call=True,
+)
+def update_tree_value(n):
+    fs = {
+        "main_report_data": {
+            "type": "!struct",
+            "label": "Fields",
+            "subfields": {
+                "qty": {
+                    "label": "Qty",
+                    "type": "number",
+                    "fieldSettings": {"min": 0},
+                    "valueSources": ["value"],
+                    "preferWidgets": ["number"],
+                },
+            },
+        }
+    }
+    print("upds", fs)
+    return fs
 
 
 @app.callback(
