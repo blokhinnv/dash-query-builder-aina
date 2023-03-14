@@ -175,7 +175,7 @@ class Number:
         """
         return self.value
 
-    def generate_template(self) -> int | float:
+    def generate_template(self) :
         """
         Generate a number based on the value.
 
