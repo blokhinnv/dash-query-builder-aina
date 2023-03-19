@@ -102,27 +102,57 @@ export default class BaseQueryBuilder extends Component {
 
     }
 
+    // getFields = (fields) => {
+    //     let options = []
+    //     Object.keys(fields).forEach((fieldName) => {
+    //         let field = fields[fieldName]
+    //         Object.keys(field).forEach((subfieldName) => {
+    //             options.push(`${fieldName}.${subfieldName}`)
+    //         })
+    //     })
+    //     return options
+    // }
+
+    // removeFields = (tree, fields) => {
+    //     const { id, type, children1, properties } = tree;
+    //     if (type === 'rule' && properties.field === fieldName) {
+    //         return null;
+    //     }
+
+    //     if (children1 == null || children1 == undefined){
+    //         return tree
+    //     }
+
+    //     const updatedChildren =
+    //     children1
+    //       .map((child) => this.removeFields(child, fieldName))
+    //       .filter(Boolean);
+
+    //     return {
+    //       id,
+    //       type,
+    //       children1: updatedChildren,
+    //       properties: { ...properties }
+    //     };
+    // };
+
     /**
      *
      * Update the state if tree has changed. This allows Dash to update the `tree` prop and have it set
      * the layout properly. Only run once and only if one of the props has changed.
      */
     componentDidUpdate(prevProps) {
-        if (prevProps.loadFormat !== this.props.loadFormat) {
-            this.setProps({ loadFormat: this.props.loadFormat })
-            this.setState({ loadFormat: this.props.loadFormat })
-        }
-        if (prevProps.alwaysShowActionButtons !== this.props.alwaysShowActionButtons) {
-            this.setProps({ alwaysShowActionButtons: this.props.alwaysShowActionButtons })
-            this.setState({ alwaysShowActionButtons: this.props.alwaysShowActionButtons })
-        }
         if (prevProps.fields !== this.props.fields) {
-            console.log("FIELDS CHANGED", prevProps.fields, this.props.fields, this.state)
-            console.log('this', this)
-            this.setProps({ fields: this.props.fields })
             let state = {...this.state}
             state.config.fields = this.props.fields
-            this.setState({ config: state.config });
+
+            let immutableTree = loadTree(emptyTree, state.config)
+            // TODO
+            // let immutableTree = loadTree(this.props.tree, state.config)
+            let currentState = this.getCurrentStateFromTree(immutableTree, state.config);
+
+            this.setState({ immutableTree: immutableTree, config: state.config });
+            this.setProps({...currentState, fields: this.props.fields});
 
         }
     }
@@ -158,8 +188,17 @@ export default class BaseQueryBuilder extends Component {
         };
         return currentState;
     };
+
+    findTree = (immutableTree) => {
+        let jsonTree = getTree(immutableTree, true, true)
+        if (jsonTree.children1 != undefined && jsonTree.children1.length == 0){
+            return this.state.immutableTree
+        }
+        return immutableTree
+    }
+
     onChange = (immutableTree, config) => {
-        // Can we use Throttle (from lodash)?
+        immutableTree = this.findTree(immutableTree)
         let currentState = this.getCurrentStateFromTree(immutableTree, config);
         this.setState({ immutableTree: immutableTree, config: config });
         this.setProps(currentState);
@@ -171,7 +210,7 @@ export default class BaseQueryBuilder extends Component {
                 <Query
                     {...this.state.config}
                     value={this.state.immutableTree || emptyTree}
-                    onChange={this.onChange}
+                    onChange={(immutableTree, config) => {this.onChange(immutableTree, config)}}
                     renderBuilder={this.renderBuilder}
                 />
             </div>
@@ -179,6 +218,8 @@ export default class BaseQueryBuilder extends Component {
     };
 
     renderBuilder = (props) => {
+        let tree = this.findTree(props.tree)
+        props = {...props, tree: tree}
         return (<div className="query-builder-container" style={{ padding: '10px' }}>
             <div className={this.state.alwaysShowActionButtons ? 'query-builder' : 'query-builder qb-lite'}>
                 <Builder {...props} />
