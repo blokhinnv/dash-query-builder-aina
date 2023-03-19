@@ -33,6 +33,14 @@ export default class BaseQueryBuilder extends Component {
             ...props.config,
             fields,
         };
+        // TODO: вынести выше
+        config.settings = {
+            ...config.settings,
+            fieldLabel: "Поле",
+            addRuleLabel: "Добавить правило",
+            addGroupLabel: "Добавить группу",
+            notLabel: "Не"
+        }
         this.setProps = props.setProps;
         let loadFormat = (props.loadFormat === null || props.loadFormat === undefined) ? 'tree' : props.loadFormat;
         if (props.loadFormat === null || props.loadFormat === undefined) {
@@ -147,7 +155,7 @@ export default class BaseQueryBuilder extends Component {
             state.config.fields = this.props.fields
 
             let immutableTree = loadTree(emptyTree, state.config)
-            // TODO
+            // TODO: доработать, пока просто удаляем все
             // let immutableTree = loadTree(this.props.tree, state.config)
             let currentState = this.getCurrentStateFromTree(immutableTree, state.config);
 
@@ -198,6 +206,7 @@ export default class BaseQueryBuilder extends Component {
     }
 
     onChange = (immutableTree, config) => {
+        console.log("config", config)
         immutableTree = this.findTree(immutableTree)
         let currentState = this.getCurrentStateFromTree(immutableTree, config);
         this.setState({ immutableTree: immutableTree, config: config });
