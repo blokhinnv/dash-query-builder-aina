@@ -16,6 +16,8 @@ const { loadTree,
 } = Utils;
 const emptyTree = { id: uuid(), type: 'group' };
 
+// https://github.com/ukrbublik/react-awesome-query-builder/blob/35027ddc91e4211c9960e29c8e16ae851a425ec0/packages/ui/modules/components/Query.jsx
+// https://github.com/ukrbublik/react-awesome-query-builder/blob/5af1548bcbc8001430b503aa4a1a15aa312a9af2/packages/examples/demo/index.tsx#L140-L146
 
 /** DashQueryBuilder is a Dash Component based on [`react-awesome-query-builder`](https://github.com/ukrbublik/react-awesome-query-builder).
  *
@@ -150,13 +152,17 @@ export default class BaseQueryBuilder extends Component {
      * the layout properly. Only run once and only if one of the props has changed.
      */
     componentDidUpdate(prevProps) {
+
         if (prevProps.fields !== this.props.fields) {
             let state = {...this.state}
             state.config.fields = this.props.fields
 
             let immutableTree = loadTree(emptyTree, state.config)
             // TODO: доработать, пока просто удаляем все
+            // это приводит к ошибке
             // let immutableTree = loadTree(this.props.tree, state.config)
+            // это почему-то обнуляет дерево?
+            // immutableTree = checkTree(this.state.immutableTree, state.config)
             let currentState = this.getCurrentStateFromTree(immutableTree, state.config);
 
             this.setState({ immutableTree: immutableTree, config: state.config });
@@ -205,8 +211,7 @@ export default class BaseQueryBuilder extends Component {
         return immutableTree
     }
 
-    onChange = (immutableTree, config) => {
-        console.log("config", config)
+    onChange = (immutableTree, config, la) => {
         immutableTree = this.findTree(immutableTree)
         let currentState = this.getCurrentStateFromTree(immutableTree, config);
         this.setState({ immutableTree: immutableTree, config: config });
