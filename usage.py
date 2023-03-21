@@ -50,6 +50,7 @@ fields = {
 tree = {
     "id": "aa8abaa8-cdef-4012-b456-717f1e3484de",
     "type": "group",
+    "manual": True,
     "children1": [
         {
             "id": "98a9baba-4567-489a-bcde-f17f1e35f74c",
@@ -122,7 +123,7 @@ app.layout = html.Div(
             theme="bootstrap",
             alwaysShowActionButtons=True,
             tree=None,
-            loadFormat="tree",
+            loadFormat="spelFormat",
         ),
         html.Div(id="output"),
         html.Hr(),

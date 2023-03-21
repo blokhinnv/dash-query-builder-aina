@@ -27,22 +27,51 @@ const emptyTree = { id: uuid(), type: 'group' };
  * The optional property `theme` is one of 'mui', `material`, `antd`, `bootstrap` or `basic`. This is the styling of the component.
  * These are the only themes supported by `react-awesome-query-builder`.
  */
+
+/**
+ * Переводит конфиг UI на русский язык
+ */
+const translateConfig = (originalConfig) =>{
+    let newConfig = {...originalConfig}
+    newConfig.settings = {
+        ...newConfig.settings,
+        fieldLabel: "Поле",
+        addRuleLabel: "Добавить правило",
+        addGroupLabel: "Добавить группу",
+        notLabel: "Не"
+    }
+    newConfig.conjunctions.AND.label = "И"
+    newConfig.conjunctions.OR.label = "Или"
+    let translation = {
+        text: "Введите строку",
+        number: "Введите число",
+        slider: "Введите Введите число или передвиньте слайдер",
+        time: "Введите время",
+        textarea: "Введите текст",
+        select: "Выберите значение",
+        multiselect: "Выберите значения",
+        func: "Выберите функцию",
+        field: "Выберите поле для сравнения",
+        datetime: "Выберите дату и время",
+        date: "Выберите дату",
+    }
+    Object.entries(translation).forEach(entry => {
+        const [type, placeholder] = entry
+        newConfig.widgets[type].valuePlaceholder = placeholder
+    })
+    return newConfig
+}
+
 export default class BaseQueryBuilder extends Component {
     constructor(props) {
         super(props);
         const fields = props.fields;
-        const config = {
+        // TODO: сделать настройку для локализации
+        const config = translateConfig({
             ...props.config,
             fields,
-        };
-        // TODO: вынести выше
-        config.settings = {
-            ...config.settings,
-            fieldLabel: "Поле",
-            addRuleLabel: "Добавить правило",
-            addGroupLabel: "Добавить группу",
-            notLabel: "Не"
-        }
+        });
+
         this.setProps = props.setProps;
         let loadFormat = (props.loadFormat === null || props.loadFormat === undefined) ? 'tree' : props.loadFormat;
         if (props.loadFormat === null || props.loadFormat === undefined) {
@@ -111,47 +140,24 @@ export default class BaseQueryBuilder extends Component {
         }
 
     }
-
-    // getFields = (fields) => {
-    //     let options = []
-    //     Object.keys(fields).forEach((fieldName) => {
-    //         let field = fields[fieldName]
-    //         Object.keys(field).forEach((subfieldName) => {
-    //             options.push(`${fieldName}.${subfieldName}`)
-    //         })
-    //     })
-    //     return options
-    // }
-
-    // removeFields = (tree, fields) => {
-    //     const { id, type, children1, properties } = tree;
-    //     if (type === 'rule' && properties.field === fieldName) {
-    //         return null;
-    //     }
-
-    //     if (children1 == null || children1 == undefined){
-    //         return tree
-    //     }
-
-    //     const updatedChildren =
-    //     children1
-    //       .map((child) => this.removeFields(child, fieldName))
-    //       .filter(Boolean);
-
-    //     return {
-    //       id,
-    //       type,
-    //       children1: updatedChildren,
-    //       properties: { ...properties }
-    //     };
-    // };
-
     /**
      *
      * Update the state if tree has changed. This allows Dash to update the `tree` prop and have it set
      * the layout properly. Only run once and only if one of the props has changed.
      */
     componentDidUpdate(prevProps) {
+        // TODO: избавиться от костыля manual
+        if (prevProps.tree !== this.props.tree && (this.props.tree.manual != undefined && this.props.tree.manual != false )){
+            delete this.props.tree.manual
+            let immutableTree = this.loadModifiedTree('tree', this.props.tree);
+            let currentState = this.getCurrentStateFromTree(
+                immutableTree,
+                this.state.config
+            );
+            this.setState({ immutableTree: immutableTree });
+            this.setProps(currentState)
+            return
+        }
 
         if (prevProps.fields !== this.props.fields) {
             let state = {...this.state}
@@ -203,6 +209,11 @@ export default class BaseQueryBuilder extends Component {
         return currentState;
     };
 
+    /**
+     * Забирает дерево либо из аргумента, либо, если оно пустое, из состояния компонента
+     * Пока не понятно почему, но в onChange и renderBuilder иногда попадают пустые деревья
+     * Возможно, проблема в loadTree?
+     */
     findTree = (immutableTree) => {
         let jsonTree = getTree(immutableTree, true, true)
         if (jsonTree.children1 != undefined && jsonTree.children1.length == 0){
