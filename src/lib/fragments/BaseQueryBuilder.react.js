@@ -38,27 +38,81 @@ const translateConfig = (originalConfig) =>{
         fieldLabel: "Поле",
         addRuleLabel: "Добавить правило",
         addGroupLabel: "Добавить группу",
-        notLabel: "Не"
+        notLabel: "Не",
+        addCaseLabel: "Добавить условие",
+        addDefaultCaseLabel: "Добавить условие по умолчанию",
+        addSubRuleLabel: "Добавить условие подправило",
+        defaultCaseLabel: "По умолчанию: ",
+        fieldPlaceholder: "Выберите поле",
+        funcLabel: "Функция",
+        funcPlaceholder: "Выберите функцию",
+        operatorLabel: "Оператор",
+        operatorPlaceholder: "Выберите оператор",
+        valueSourcesPopupTitle: "Выберите источник значения",
+
+
     }
     newConfig.conjunctions.AND.label = "И"
     newConfig.conjunctions.OR.label = "Или"
     let translation = {
-        text: "Введите строку",
-        number: "Введите число",
-        slider: "Введите Введите число или передвиньте слайдер",
-        time: "Введите время",
-        textarea: "Введите текст",
-        select: "Выберите значение",
-        multiselect: "Выберите значения",
-        func: "Выберите функцию",
-        field: "Выберите поле для сравнения",
-        datetime: "Выберите дату и время",
-        date: "Выберите дату",
+        text: {
+            valuePlaceholder: "Введите строку",
+            valueLabel: "Строка"
+        },
+        number: {
+            valuePlaceholder: "Введите число",
+            valueLabel: "Число"
+        },
+        slider: {
+            valuePlaceholder: "Введите число или передвиньте слайдер",
+            valueLabel: "Число"
+        },
+        time: {
+            valuePlaceholder: "Введите время",
+            valueLabel: "Время"
+        },
+        textarea: {
+            valuePlaceholder: "Введите текст",
+            valueLabel: "Текст"
+        },
+        select: {
+            valuePlaceholder: "Выберите значение",
+            valueLabel: "Значение"
+        },
+        multiselect: {
+            valuePlaceholder: "Выберите значения",
+            valueLabel: "Значения"
+        },
+        func: {
+            valuePlaceholder: "Выберите функцию",
+            valueLabel: "Функция"
+        },
+        field: {
+            valuePlaceholder: "Выберите поле для сравнения",
+            valueLabel: "Поле для сравнения"
+        },
+        datetime: {
+            valuePlaceholder: "Выберите дату и время",
+            valueLabel: "Дата и время",
+        },
+        date: {
+            valuePlaceholder: "Выберите дату",
+            valueLabel: "Дата",
+        },
+        boolean: {
+            labelNo: "Нет",
+            labelYes: "Да",
+        },
+
     }
     Object.entries(translation).forEach(entry => {
-        const [type, placeholder] = entry
-        newConfig.widgets[type].valuePlaceholder = placeholder
+        const [type, translatedFields] = entry
+        newConfig.widgets[type] = {
+            ...newConfig.widgets[type],
+            ...translatedFields
+        }
     })
+
     return newConfig
 }
 

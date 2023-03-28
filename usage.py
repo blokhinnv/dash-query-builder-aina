@@ -68,10 +68,10 @@ tree = {
             "type": "rule",
             "properties": {
                 "field": "main_report_data.price",
-                "operator": "between",
-                "value": [11, 30],
-                "valueSrc": ["value", None],
-                "valueType": ["number", "number"],
+                "operator": "equal",
+                "value": [11],
+                "valueSrc": ["value"],
+                "valueType": ["number"],
             },
         },
         {
