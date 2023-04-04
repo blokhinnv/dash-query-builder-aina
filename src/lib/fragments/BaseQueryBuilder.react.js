@@ -16,6 +16,8 @@ const { loadTree,
 } = Utils;
 const emptyTree = { id: uuid(), type: 'group' };
 
+// https://github.com/ukrbublik/react-awesome-query-builder/blob/35027ddc91e4211c9960e29c8e16ae851a425ec0/packages/ui/modules/components/Query.jsx
+// https://github.com/ukrbublik/react-awesome-query-builder/blob/5af1548bcbc8001430b503aa4a1a15aa312a9af2/packages/examples/demo/index.tsx#L140-L146
 
 /** DashQueryBuilder is a Dash Component based on [`react-awesome-query-builder`](https://github.com/ukrbublik/react-awesome-query-builder).
  *
@@ -25,14 +27,105 @@ const emptyTree = { id: uuid(), type: 'group' };
  * The optional property `theme` is one of 'mui', `material`, `antd`, `bootstrap` or `basic`. This is the styling of the component.
  * These are the only themes supported by `react-awesome-query-builder`.
  */
+
+/**
+ * Переводит конфиг UI на русский язык
+ */
+const translateConfig = (originalConfig) =>{
+    let newConfig = {...originalConfig}
+    newConfig.settings = {
+        ...newConfig.settings,
+        fieldLabel: "Поле",
+        addRuleLabel: "Добавить правило",
+        addGroupLabel: "Добавить группу",
+        notLabel: "Не",
+        addCaseLabel: "Добавить условие",
+        addDefaultCaseLabel: "Добавить условие по умолчанию",
+        addSubRuleLabel: "Добавить условие подправило",
+        defaultCaseLabel: "По умолчанию: ",
+        fieldPlaceholder: "Выберите поле",
+        funcLabel: "Функция",
+        funcPlaceholder: "Выберите функцию",
+        operatorLabel: "Оператор",
+        operatorPlaceholder: "Выберите оператор",
+        valueSourcesPopupTitle: "Выберите источник значения",
+
+
+    }
+    newConfig.conjunctions.AND.label = "И"
+    newConfig.conjunctions.OR.label = "Или"
+    let translation = {
+        text: {
+            valuePlaceholder: "Введите строку",
+            valueLabel: "Строка"
+        },
+        number: {
+            valuePlaceholder: "Введите число",
+            valueLabel: "Число"
+        },
+        slider: {
+            valuePlaceholder: "Введите число или передвиньте слайдер",
+            valueLabel: "Число"
+        },
+        time: {
+            valuePlaceholder: "Введите время",
+            valueLabel: "Время"
+        },
+        textarea: {
+            valuePlaceholder: "Введите текст",
+            valueLabel: "Текст"
+        },
+        select: {
+            valuePlaceholder: "Выберите значение",
+            valueLabel: "Значение"
+        },
+        multiselect: {
+            valuePlaceholder: "Выберите значения",
+            valueLabel: "Значения"
+        },
+        func: {
+            valuePlaceholder: "Выберите функцию",
+            valueLabel: "Функция"
+        },
+        field: {
+            valuePlaceholder: "Выберите поле для сравнения",
+            valueLabel: "Поле для сравнения"
+        },
+        datetime: {
+            valuePlaceholder: "Выберите дату и время",
+            valueLabel: "Дата и время",
+        },
+        date: {
+            valuePlaceholder: "Выберите дату",
+            valueLabel: "Дата",
+        },
+        boolean: {
+            labelNo: "Нет",
+            labelYes: "Да",
+        },
+
+    }
+    Object.entries(translation).forEach(entry => {
+        const [type, translatedFields] = entry
+        newConfig.widgets[type] = {
+            ...newConfig.widgets[type],
+            ...translatedFields
+        }
+    })
+
+    return newConfig
+}
+
 export default class BaseQueryBuilder extends Component {
     constructor(props) {
         super(props);
         const fields = props.fields;
-        const config = {
+        // TODO: сделать настройку для локализации
+        const config = translateConfig({
             ...props.config,
             fields,
-        };
+        });
+
         this.setProps = props.setProps;
         let loadFormat = (props.loadFormat === null || props.loadFormat === undefined) ? 'tree' : props.loadFormat;
         if (props.loadFormat === null || props.loadFormat === undefined) {
@@ -101,28 +194,39 @@ export default class BaseQueryBuilder extends Component {
         }
 
     }
-
     /**
      *
      * Update the state if tree has changed. This allows Dash to update the `tree` prop and have it set
      * the layout properly. Only run once and only if one of the props has changed.
      */
     componentDidUpdate(prevProps) {
-        if (prevProps.loadFormat !== this.props.loadFormat) {
-            this.setProps({ loadFormat: this.props.loadFormat })
-            this.setState({ loadFormat: this.props.loadFormat })
+        // TODO: избавиться от костыля manual
+        if (prevProps.tree !== this.props.tree && (this.props.tree.manual != undefined && this.props.tree.manual != false )){
+            delete this.props.tree.manual
+            let immutableTree = this.loadModifiedTree('tree', this.props.tree);
+            let currentState = this.getCurrentStateFromTree(
+                immutableTree,
+                this.state.config
+            );
+            this.setState({ immutableTree: immutableTree });
+            this.setProps(currentState)
+            return
         }
-        if (prevProps.alwaysShowActionButtons !== this.props.alwaysShowActionButtons) {
-            this.setProps({ alwaysShowActionButtons: this.props.alwaysShowActionButtons })
-            this.setState({ alwaysShowActionButtons: this.props.alwaysShowActionButtons })
-        }
+
         if (prevProps.fields !== this.props.fields) {
-            console.log("FIELDS CHANGED", prevProps.fields, this.props.fields, this.state)
-            console.log('this', this)
-            this.setProps({ fields: this.props.fields })
             let state = {...this.state}
             state.config.fields = this.props.fields
-            this.setState({ config: state.config });
+
+            let immutableTree = loadTree(emptyTree, state.config)
+            // TODO: доработать, пока просто удаляем все
+            // это приводит к ошибке
+            // let immutableTree = loadTree(this.props.tree, state.config)
+            // это почему-то обнуляет дерево?
+            // immutableTree = checkTree(this.state.immutableTree, state.config)
+            let currentState = this.getCurrentStateFromTree(immutableTree, state.config);
+
+            this.setState({ immutableTree: immutableTree, config: state.config });
+            this.setProps({...currentState, fields: this.props.fields});
 
         }
     }
@@ -158,8 +262,22 @@ export default class BaseQueryBuilder extends Component {
         };
         return currentState;
     };
-    onChange = (immutableTree, config) => {
-        // Can we use Throttle (from lodash)?
+
+    /**
+     * Забирает дерево либо из аргумента, либо, если оно пустое, из состояния компонента
+     * Пока не понятно почему, но в onChange и renderBuilder иногда попадают пустые деревья
+     * Возможно, проблема в loadTree?
+     */
+    findTree = (immutableTree) => {
+        let jsonTree = getTree(immutableTree, true, true)
+        if (jsonTree.children1 != undefined && jsonTree.children1.length == 0){
+            return this.state.immutableTree
+        }
+        return immutableTree
+    }
+
+    onChange = (immutableTree, config, la) => {
+        immutableTree = this.findTree(immutableTree)
         let currentState = this.getCurrentStateFromTree(immutableTree, config);
         this.setState({ immutableTree: immutableTree, config: config });
         this.setProps(currentState);
@@ -171,7 +289,7 @@ export default class BaseQueryBuilder extends Component {
                 <Query
                     {...this.state.config}
                     value={this.state.immutableTree || emptyTree}
-                    onChange={this.onChange}
+                    onChange={(immutableTree, config) => {this.onChange(immutableTree, config)}}
                     renderBuilder={this.renderBuilder}
                 />
             </div>
@@ -179,6 +297,8 @@ export default class BaseQueryBuilder extends Component {
     };
 
     renderBuilder = (props) => {
+        let tree = this.findTree(props.tree)
+        props = {...props, tree: tree}
         return (<div className="query-builder-container" style={{ padding: '10px' }}>
             <div className={this.state.alwaysShowActionButtons ? 'query-builder' : 'query-builder qb-lite'}>
                 <Builder {...props} />
