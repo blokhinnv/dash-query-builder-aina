@@ -123,7 +123,7 @@ app.layout = html.Div(
             theme="bootstrap",
             alwaysShowActionButtons=True,
             tree=None,
-            loadFormat="spelFormat",
+            loadFormat="tree",
         ),
         html.Div(id="output"),
         html.Hr(),
@@ -172,10 +172,11 @@ def update_load_format(n_clicks_tree, n_clicks_json, n_clicks_spel):
         State("input", "sqlFormat"),
         State("input", "jsonLogicFormat"),
         State("input", "spelFormat"),
+        State("input", "fields"),
     ],
     prevent_initial_call=True,
 )
-def display_output(tree_value, sqlFormat, jsonLogicFormat, spelFormat):
+def display_output(tree_value, sqlFormat, jsonLogicFormat, spelFormat, fields):
     output = html.Div(
         children=[
             html.H1("tree"),
@@ -189,6 +190,9 @@ def display_output(tree_value, sqlFormat, jsonLogicFormat, spelFormat):
             html.Hr(),
             html.H1("spelFormat"),
             html.Div(spelFormat),
+            html.Hr(),
+            html.H1("fields"),
+            html.Div(str(fields)),
         ]
     )
     return output
