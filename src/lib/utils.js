@@ -9,7 +9,7 @@ const getFieldsSet = (cfg) => {
     return fields;
 };
 
-const fieldSetsEqual = (cfg1, cfg2) => {
+export const fieldSetsEqual = (cfg1, cfg2) => {
     const fields1 = getFieldsSet(cfg1);
     const fields2 = getFieldsSet(cfg2);
     return (
@@ -18,4 +18,7 @@ const fieldSetsEqual = (cfg1, cfg2) => {
     );
 };
 
-export default fieldSetsEqual;
+export const switchRemoveIncomplete = (config, remove) => {
+    config.settings.removeIncompleteRulesOnLoad = remove;
+    return config;
+};

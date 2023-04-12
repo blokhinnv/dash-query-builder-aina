@@ -2,7 +2,32 @@
   "src/lib/components/DashQueryBuilder.react.js": {
     "description": "DashQueryBuilder is a Dash Component based on [`react-awesome-query-builder`](https://github.com/ukrbublik/react-awesome-query-builder).\r\n\r\nIt takes a `fields` property to generate the options for building the actual query.\r\nThe optional property `tree` is used to define the current state of the tree. It can be used to\r\ndefine the starting state of the query builder.\r\nThe optional property `theme` is one of `material`, `mui`, `antd`, `bootstrap` or `basic`. This is the styling of the component.\r\nThese are the only themes supported by `react-awesome-query-builder`.",
     "displayName": "DashQueryBuilder",
-    "methods": [],
+    "methods": [
+      {
+        "name": "updateProps",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "settings",
+            "type": null
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "updateTree",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "tree",
+            "type": null
+          }
+        ],
+        "returns": null
+      }
+    ],
     "props": {
       "id": {
         "type": {
@@ -134,7 +159,7 @@
           "name": "enum",
           "value": [
             {
-              "value": "\"mui\"",
+              "value": "'mui'",
               "computed": false
             },
             {

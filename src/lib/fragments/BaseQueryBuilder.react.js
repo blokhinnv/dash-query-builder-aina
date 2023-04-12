@@ -1,40 +1,12 @@
-import React, {
-    Component,
-    useCallback,
-    useContext,
-    useEffect,
-    useState,
-} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {
     Utils as QbUtils,
     Query,
     Builder,
-    BasicConfig,
 } from '@react-awesome-query-builder/ui';
 import translateConfig from '../translate/translate';
-import {
-    SettingsContext,
-    TreeContext,
-    getCurrentSettings,
-} from '../contexts/SettingsContext';
-import fieldSetsEqual from '../utils';
-
-/* import {Utils, Query, Builder} from '@react-awesome-query-builder/ui';
-const {
-    loadTree,
-    _loadFromJsonLogic,
-    loadFromSpel,
-    checkTree,
-    queryString,
-    queryBuilderFormat,
-    mongodbFormat,
-    sqlFormat,
-    jsonLogicFormat,
-    elasticSearchFormat,
-    spelFormat,
-    getTree,
-    uuid,
-} = Utils;*/
+import {SettingsContext, getCurrentSettings} from '../contexts/SettingsContext';
+import {fieldSetsEqual, switchRemoveIncomplete} from '../utils';
 
 const emptyTree = {id: QbUtils.uuid(), type: 'group'};
 
@@ -51,35 +23,54 @@ const emptyTree = {id: QbUtils.uuid(), type: 'group'};
  */
 
 const BaseQueryBuilder = (props) => {
-    const {fields, alwaysShowActionButtons, tree} = props;
+    const {fields, alwaysShowActionButtons} = props;
     const [config, setConfig] = useState({
         ...translateConfig(props.config),
         fields: fields,
     });
-    const [state, setState] = useState({
-        tree: QbUtils.checkTree(QbUtils.loadTree(tree || emptyTree), config),
-    });
+    const [tree, setTree] = useState(
+        QbUtils.checkTree(QbUtils.loadTree(emptyTree), config)
+    );
+
     const {updateProps} = useContext(SettingsContext);
 
     useEffect(() => {
         if (!fieldSetsEqual(props.fields, config.fields)) {
-            const updatedConfig = {...config, fields: props.fields};
+            const updatedConfig = switchRemoveIncomplete(
+                {...config, fields: props.fields},
+                true
+            );
             setConfig(updatedConfig);
-            setState((prevState) => ({
-                ...prevState,
-                tree: QbUtils.checkTree(state.tree, updatedConfig),
-                config: updatedConfig,
-            }));
+            const immutableTree = QbUtils.checkTree(
+                QbUtils.loadTree(props.tree),
+                updatedConfig
+            );
+            setTree(immutableTree);
+            updateProps(getCurrentSettings(immutableTree, updatedConfig));
         }
     }, [props.fields]);
 
-    const onChange = useCallback((immutableTree, config) => {
-        setState((prevState) => ({
-            ...prevState,
-            tree: immutableTree,
-            config: config,
-        }));
+    useEffect(() => {
+        console.log('UPDATE TREE');
+        if (props.tree === null) {
+            return;
+        }
+        const immutableTree = QbUtils.checkTree(
+            QbUtils.loadTree(props.tree),
+            config
+        );
+        setTree(immutableTree);
+    }, [props.tree]);
 
+    const onChange = useCallback((immutableTree, config) => {
+        setTree(immutableTree);
+        if (config.settings.removeIncompleteRulesOnLoad) {
+            const updatedConfig = switchRemoveIncomplete(config, false);
+            setConfig(updatedConfig);
+            updateProps(getCurrentSettings(immutableTree, updatedConfig));
+            return;
+        }
+        setConfig(config);
         updateProps(getCurrentSettings(immutableTree, config));
     }, []);
 
@@ -103,7 +94,7 @@ const BaseQueryBuilder = (props) => {
         <div>
             <Query
                 {...config}
-                value={state.tree}
+                value={tree}
                 onChange={onChange}
                 renderBuilder={renderBuilder}
             />

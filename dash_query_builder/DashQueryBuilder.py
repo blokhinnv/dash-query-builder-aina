@@ -65,7 +65,7 @@ Keyword arguments:
 - sqlFormat (string; optional):
     The SQL Formatted string defined by the current state of the tree.
 
-- theme (a value equal to: "mui", 'antd', 'basic', 'bootstrap'; default 'basic'):
+- theme (a value equal to: 'mui', 'antd', 'basic', 'bootstrap'; default 'basic'):
     Sets the theme of the query builder.
 
 - tree (boolean | number | string | dict | list; default loadTree(emptyTree)):
