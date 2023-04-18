@@ -23,6 +23,19 @@ const emptyTree = {id: QbUtils.uuid(), type: 'group'};
  */
 
 const BaseQueryBuilder = (props) => {
+    console.log(props)
+    console.log(props.disabled)
+
+    if(props.disabled){
+        props.config.settings = {...props.config.settings, 
+            immutableGroupsMode: true,
+            immutableFieldsMode: true,
+            immutableOpsMode: true,
+            immutableValuesMode: true,
+            canReorder: false,
+            canRegroup: false,
+        }
+    }
     const {fields, alwaysShowActionButtons} = props;
     const [config, setConfig] = useState({
         ...translateConfig(props.config),
