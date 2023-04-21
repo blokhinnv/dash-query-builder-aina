@@ -23,31 +23,31 @@ const emptyTree = {id: QbUtils.uuid(), type: 'group'};
  */
 
 const BaseQueryBuilder = (props) => {
-    console.log(props)
-    console.log(props.disabled)
+    
+    console.log('Вызов компонента')
+    
+    
 
-    if(props.disabled){
-        props.config.settings = {...props.config.settings, 
-            immutableGroupsMode: true,
-            immutableFieldsMode: true,
-            immutableOpsMode: true,
-            immutableValuesMode: true,
-            canReorder: false,
-            canRegroup: false,
-        }
-    }
+
     const {fields, alwaysShowActionButtons} = props;
+
     const [config, setConfig] = useState({
         ...translateConfig(props.config),
         fields: fields,
     });
+
     const [tree, setTree] = useState(
         QbUtils.checkTree(QbUtils.loadTree(emptyTree), config)
     );
 
     const {updateProps} = useContext(SettingsContext);
+    
+
 
     useEffect(() => {
+
+        // console.log('Fields')
+
         if (!fieldSetsEqual(props.fields, config.fields)) {
             const updatedConfig = switchRemoveIncomplete(
                 {...config, fields: props.fields},
@@ -64,7 +64,9 @@ const BaseQueryBuilder = (props) => {
     }, [props.fields]);
 
     useEffect(() => {
-        console.log('UPDATE TREE');
+
+        // console.log('UPDATE TREE');
+        
         if (props.tree === null) {
             return;
         }
@@ -76,6 +78,9 @@ const BaseQueryBuilder = (props) => {
     }, [props.tree]);
 
     const onChange = useCallback((immutableTree, config) => {
+       
+        // console.log('onChange')
+
         setTree(immutableTree);
         if (config.settings.removeIncompleteRulesOnLoad) {
             const updatedConfig = switchRemoveIncomplete(config, false);
@@ -87,30 +92,69 @@ const BaseQueryBuilder = (props) => {
         updateProps(getCurrentSettings(immutableTree, config));
     }, []);
 
+
+
+
+
+    const [pointerEv, setPointerEv] = useState('none');
+    const [styleDis, setStyleDis] = useState({width: '100%', height: '100%', background: 'gray', opacity: "70%"});
+
+    const [x, setX] = useState(0);
+    const [y, setY] = useState(0);
+
+    useEffect(()=> {
+
+        setX(x+1)
+    },[props.disabled])
+    
+    useEffect(() => {
+        if(x !== y){
+            setY(x)
+        }
+    }, [x])
+    
+
+    useEffect(() => {
+
+        if(x % 2 == 0){
+            setPointerEv('none')
+            setStyleDis({width: '100%', height: '100%', background: 'gray', opacity: "70%"});
+            
+        }else{
+
+            setPointerEv('auto')
+            setStyleDis({});
+        }
+    }, [y])
+
     const renderBuilder = useCallback((props) => {
+        console.log('render')
         return (
             <div className="query-builder-container" style={{padding: '10px'}}>
-                <div
-                    className={
-                        alwaysShowActionButtons
-                            ? 'query-builder'
-                            : 'query-builder qb-lite'
-                    }
-                >
-                    <Builder {...props} />
+                    <div
+                        className={
+                            alwaysShowActionButtons
+                                ? 'query-builder'
+                                : 'query-builder qb-lite'
+                        }
+                    >
+                        <Builder {...props} />
+                    </div>
                 </div>
-            </div>
+
         );
     }, []);
 
     return (
-        <div>
-            <Query
-                {...config}
-                value={tree}
-                onChange={onChange}
-                renderBuilder={renderBuilder}
-            />
+        <div style={styleDis}> 
+            <div style={{pointerEvents: pointerEv}}>
+                <Query
+                    {...config}
+                    value={tree}
+                    onChange={onChange}
+                    renderBuilder={renderBuilder}
+                />
+            </div>
         </div>
     );
 };

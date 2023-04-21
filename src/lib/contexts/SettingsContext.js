@@ -7,7 +7,7 @@ export const getCurrentSettings = (immutableTree, config) => {
     let currentSettings = {
         tree: QbUtils.getTree(immutableTree),
         sqlFormat: QbUtils.sqlFormat(immutableTree, config),
-        fields: config.fields,
+        fields: config.fields
     };
     return currentSettings;
 };

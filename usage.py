@@ -154,9 +154,17 @@ def update_tree_value(n):
         rv = tree
     else:
         rv = empty_
-
     return rv
 
+@app.callback(
+    Output("input", "disabled"),
+    Input("btn-disabled", "n_clicks"),
+    # prevent_initial_call=True,
+)
+def btn_disabled(n):
+    if n is not None and n % 2 == 1:
+        return True
+    return False
 
 
 

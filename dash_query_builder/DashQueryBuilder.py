@@ -28,7 +28,7 @@ Keyword arguments:
     operators or widgets. Setting this is currently in alpha, it is
     very unstable.
 
-- disabled (boolean; default False)
+- disabled (boolean; optional)
 
 - elasticSearchFormat (dict; optional):
     The JSON Logic Formatted defined by the current state of the tree.

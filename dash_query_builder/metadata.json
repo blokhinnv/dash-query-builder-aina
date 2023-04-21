@@ -159,11 +159,7 @@
           "name": "bool"
         },
         "required": false,
-        "description": "",
-        "defaultValue": {
-          "value": "false",
-          "computed": false
-        }
+        "description": ""
       },
       "theme": {
         "type": {
