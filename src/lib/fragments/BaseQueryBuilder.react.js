@@ -33,7 +33,6 @@ const BaseQueryBuilder = (props) => {
         QbUtils.checkTree(QbUtils.loadTree(emptyTree), config)
     );
     const {updateProps} = useContext(SettingsContext);
-    
     useEffect(() => {
         if (!fieldSetsEqual(props.fields, config.fields)) {
             const updatedConfig = switchRemoveIncomplete(
@@ -49,7 +48,6 @@ const BaseQueryBuilder = (props) => {
             updateProps(getCurrentSettings(immutableTree, updatedConfig));
         }
     }, [props.fields]);
-
     useEffect(() => {
         if (props.tree === null) {
             return;
@@ -60,7 +58,6 @@ const BaseQueryBuilder = (props) => {
         );
         setTree(immutableTree);
     }, [props.tree]);
-
     const onChange = useCallback((immutableTree, config) => {
         setTree(immutableTree);
         if (config.settings.removeIncompleteRulesOnLoad) {
@@ -75,8 +72,7 @@ const BaseQueryBuilder = (props) => {
 
 
 
-    // Disabled react commponent
-
+    // Disabled React commponent
     const [pointerEv, setPointerEv] = useState('auto');
     const [styleDis, setStyleDis] = useState({});
 
@@ -94,7 +90,6 @@ const BaseQueryBuilder = (props) => {
 
 
     const renderBuilder = useCallback((props) => {
-        console.log('render')
         return (
             <div className="query-builder-container" style={{padding: '10px'}}>
                     <div
