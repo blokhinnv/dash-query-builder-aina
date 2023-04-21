@@ -23,31 +23,18 @@ const emptyTree = {id: QbUtils.uuid(), type: 'group'};
  */
 
 const BaseQueryBuilder = (props) => {
-    
-    console.log('Вызов компонента')
-    
-    
-
 
     const {fields, alwaysShowActionButtons} = props;
-
     const [config, setConfig] = useState({
         ...translateConfig(props.config),
         fields: fields,
     });
-
     const [tree, setTree] = useState(
         QbUtils.checkTree(QbUtils.loadTree(emptyTree), config)
     );
-
     const {updateProps} = useContext(SettingsContext);
     
-
-
     useEffect(() => {
-
-        // console.log('Fields')
-
         if (!fieldSetsEqual(props.fields, config.fields)) {
             const updatedConfig = switchRemoveIncomplete(
                 {...config, fields: props.fields},
@@ -64,9 +51,6 @@ const BaseQueryBuilder = (props) => {
     }, [props.fields]);
 
     useEffect(() => {
-
-        // console.log('UPDATE TREE');
-        
         if (props.tree === null) {
             return;
         }
@@ -78,9 +62,6 @@ const BaseQueryBuilder = (props) => {
     }, [props.tree]);
 
     const onChange = useCallback((immutableTree, config) => {
-       
-        // console.log('onChange')
-
         setTree(immutableTree);
         if (config.settings.removeIncompleteRulesOnLoad) {
             const updatedConfig = switchRemoveIncomplete(config, false);
@@ -94,38 +75,23 @@ const BaseQueryBuilder = (props) => {
 
 
 
+    // Disabled react commponent
 
-
-    const [pointerEv, setPointerEv] = useState('none');
-    const [styleDis, setStyleDis] = useState({width: '100%', height: '100%', background: 'gray', opacity: "70%"});
-
-    const [x, setX] = useState(0);
-    const [y, setY] = useState(0);
-
-    useEffect(()=> {
-
-        setX(x+1)
-    },[props.disabled])
-    
-    useEffect(() => {
-        if(x !== y){
-            setY(x)
-        }
-    }, [x])
-    
+    const [pointerEv, setPointerEv] = useState('auto');
+    const [styleDis, setStyleDis] = useState({});
 
     useEffect(() => {
-
-        if(x % 2 == 0){
+        if(props.disabled){
             setPointerEv('none')
             setStyleDis({width: '100%', height: '100%', background: 'gray', opacity: "70%"});
-            
         }else{
-
             setPointerEv('auto')
             setStyleDis({});
         }
-    }, [y])
+    }, [props.disabled])
+
+
+
 
     const renderBuilder = useCallback((props) => {
         console.log('render')
