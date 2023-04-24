@@ -154,6 +154,13 @@
           "computed": false
         }
       },
+      "disabled": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": ""
+      },
       "theme": {
         "type": {
           "name": "enum",

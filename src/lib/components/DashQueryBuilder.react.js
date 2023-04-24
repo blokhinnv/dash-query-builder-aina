@@ -53,7 +53,6 @@ export default class DashQueryBuilder extends Component {
     updateTree = (tree) => {
         this.props.setProps({tree: tree});
     };
-
     render() {
         return (
             <Suspense fallback={null}>
@@ -72,6 +71,7 @@ export const defaultProps = {
     theme: 'basic',
     alwaysShowActionButtons: true,
     loadFormat: 'tree',
+    // disabled: false,
 };
 
 const singleFieldType = PropTypes.oneOf([
@@ -186,6 +186,8 @@ export const themelessPropTypes = {
      */
     loadFormat: PropTypes.oneOf(['jsonLogicFormat', 'spelFormat', 'tree'])
         .isRequired,
+
+    disabled: PropTypes.bool,
 };
 export const propTypes = {
     ...themelessPropTypes,

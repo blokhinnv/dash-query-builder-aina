@@ -23,6 +23,7 @@ const emptyTree = {id: QbUtils.uuid(), type: 'group'};
  */
 
 const BaseQueryBuilder = (props) => {
+
     const {fields, alwaysShowActionButtons} = props;
     const [config, setConfig] = useState({
         ...translateConfig(props.config),
@@ -31,9 +32,7 @@ const BaseQueryBuilder = (props) => {
     const [tree, setTree] = useState(
         QbUtils.checkTree(QbUtils.loadTree(emptyTree), config)
     );
-
     const {updateProps} = useContext(SettingsContext);
-
     useEffect(() => {
         if (!fieldSetsEqual(props.fields, config.fields)) {
             const updatedConfig = switchRemoveIncomplete(
@@ -49,9 +48,7 @@ const BaseQueryBuilder = (props) => {
             updateProps(getCurrentSettings(immutableTree, updatedConfig));
         }
     }, [props.fields]);
-
     useEffect(() => {
-        console.log('UPDATE TREE');
         if (props.tree === null) {
             return;
         }
@@ -61,7 +58,6 @@ const BaseQueryBuilder = (props) => {
         );
         setTree(immutableTree);
     }, [props.tree]);
-
     const onChange = useCallback((immutableTree, config) => {
         setTree(immutableTree);
         if (config.settings.removeIncompleteRulesOnLoad) {
@@ -74,30 +70,52 @@ const BaseQueryBuilder = (props) => {
         updateProps(getCurrentSettings(immutableTree, config));
     }, []);
 
+
+
+    // Disabled React commponent
+    const [pointerEv, setPointerEv] = useState('auto');
+    const [styleDis, setStyleDis] = useState({});
+
+    useEffect(() => {
+        if(props.disabled){
+            setPointerEv('none')
+            setStyleDis({width: '100%', height: '100%', background: 'gray', opacity: "70%"});
+        }else{
+            setPointerEv('auto')
+            setStyleDis({});
+        }
+    }, [props.disabled])
+
+
+
+
     const renderBuilder = useCallback((props) => {
         return (
             <div className="query-builder-container" style={{padding: '10px'}}>
-                <div
-                    className={
-                        alwaysShowActionButtons
-                            ? 'query-builder'
-                            : 'query-builder qb-lite'
-                    }
-                >
-                    <Builder {...props} />
+                    <div
+                        className={
+                            alwaysShowActionButtons
+                                ? 'query-builder'
+                                : 'query-builder qb-lite'
+                        }
+                    >
+                        <Builder {...props} />
+                    </div>
                 </div>
-            </div>
+
         );
     }, []);
 
     return (
-        <div>
-            <Query
-                {...config}
-                value={tree}
-                onChange={onChange}
-                renderBuilder={renderBuilder}
-            />
+        <div style={styleDis}> 
+            <div style={{pointerEvents: pointerEv}}>
+                <Query
+                    {...config}
+                    value={tree}
+                    onChange={onChange}
+                    renderBuilder={renderBuilder}
+                />
+            </div>
         </div>
     );
 };

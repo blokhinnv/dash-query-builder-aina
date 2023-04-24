@@ -28,6 +28,8 @@ Keyword arguments:
     operators or widgets. Setting this is currently in alpha, it is
     very unstable.
 
+- disabled (boolean; optional)
+
 - elasticSearchFormat (dict; optional):
     The JSON Logic Formatted defined by the current state of the tree.
 
@@ -75,10 +77,10 @@ Keyword arguments:
     _namespace = 'dash_query_builder'
     _type = 'DashQueryBuilder'
     @_explicitize_args
-    def __init__(self, id=Component.UNDEFINED, tree=Component.UNDEFINED, fields=Component.UNDEFINED, sqlFormat=Component.UNDEFINED, queryStringFormat=Component.UNDEFINED, queryBuilderStringFormat=Component.UNDEFINED, mongodbFormat=Component.UNDEFINED, jsonLogicFormat=Component.UNDEFINED, elasticSearchFormat=Component.UNDEFINED, spelFormat=Component.UNDEFINED, alwaysShowActionButtons=Component.UNDEFINED, config=Component.UNDEFINED, loadFormat=Component.UNDEFINED, theme=Component.UNDEFINED, **kwargs):
-        self._prop_names = ['id', 'alwaysShowActionButtons', 'config', 'elasticSearchFormat', 'fields', 'jsonLogicFormat', 'loadFormat', 'mongodbFormat', 'queryBuilderStringFormat', 'queryStringFormat', 'spelFormat', 'sqlFormat', 'theme', 'tree']
+    def __init__(self, id=Component.UNDEFINED, tree=Component.UNDEFINED, fields=Component.UNDEFINED, sqlFormat=Component.UNDEFINED, queryStringFormat=Component.UNDEFINED, queryBuilderStringFormat=Component.UNDEFINED, mongodbFormat=Component.UNDEFINED, jsonLogicFormat=Component.UNDEFINED, elasticSearchFormat=Component.UNDEFINED, spelFormat=Component.UNDEFINED, alwaysShowActionButtons=Component.UNDEFINED, config=Component.UNDEFINED, loadFormat=Component.UNDEFINED, disabled=Component.UNDEFINED, theme=Component.UNDEFINED, **kwargs):
+        self._prop_names = ['id', 'alwaysShowActionButtons', 'config', 'disabled', 'elasticSearchFormat', 'fields', 'jsonLogicFormat', 'loadFormat', 'mongodbFormat', 'queryBuilderStringFormat', 'queryStringFormat', 'spelFormat', 'sqlFormat', 'theme', 'tree']
         self._valid_wildcard_attributes =            []
-        self.available_properties = ['id', 'alwaysShowActionButtons', 'config', 'elasticSearchFormat', 'fields', 'jsonLogicFormat', 'loadFormat', 'mongodbFormat', 'queryBuilderStringFormat', 'queryStringFormat', 'spelFormat', 'sqlFormat', 'theme', 'tree']
+        self.available_properties = ['id', 'alwaysShowActionButtons', 'config', 'disabled', 'elasticSearchFormat', 'fields', 'jsonLogicFormat', 'loadFormat', 'mongodbFormat', 'queryBuilderStringFormat', 'queryStringFormat', 'spelFormat', 'sqlFormat', 'theme', 'tree']
         self.available_wildcard_properties =            []
         _explicit_args = kwargs.pop('_explicit_args')
         _locals = locals()

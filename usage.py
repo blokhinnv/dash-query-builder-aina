@@ -124,6 +124,7 @@ app.layout = html.Div(
             alwaysShowActionButtons=True,
             tree=None,
             loadFormat="tree",
+            disabled=False,
         ),
         html.Div(id="output"),
         html.Hr(),
@@ -139,8 +140,32 @@ app.layout = html.Div(
         html.Button(id="update-format-json", children="Load JSONLogic"),
         html.Button(id="update-format-spel", children="Load SPEL"),
         html.Button(id="update-fields", children="update fields"),
+        html.Button(id="btn-disabled", children="Disable buttons"),
     ]
 )
+
+@app.callback(
+    Output("input", "tree"),
+    Input("update-button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def update_tree_value(n):
+    if n is not None and n % 2 == 1:
+        rv = tree
+    else:
+        rv = empty_
+    return rv
+
+@app.callback(
+    Output("input", "disabled"),
+    Input("btn-disabled", "n_clicks"),
+    # prevent_initial_call=True,
+)
+def btn_disabled(n):
+    if n is not None and n % 2 == 1:
+        return True
+    return False
+
 
 
 @app.callback(
@@ -197,19 +222,6 @@ def display_output(tree_value, sqlFormat, jsonLogicFormat, spelFormat, fields):
     )
     return output
 
-
-@app.callback(
-    Output("input", "tree"),
-    Input("update-button", "n_clicks"),
-    prevent_initial_call=True,
-)
-def update_tree_value(n):
-    if n is not None and n % 2 == 1:
-        rv = tree
-    else:
-        rv = empty_
-
-    return rv
 
 @app.callback(
     Output("input", "fields"),
