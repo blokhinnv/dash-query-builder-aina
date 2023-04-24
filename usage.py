@@ -123,7 +123,8 @@ app.layout = html.Div(
             theme="bootstrap",
             alwaysShowActionButtons=True,
             tree=None,
-            loadFormat="spelFormat",
+            loadFormat="tree",
+            disabled=False,
         ),
         html.Div(id="output"),
         html.Hr(),
@@ -139,8 +140,32 @@ app.layout = html.Div(
         html.Button(id="update-format-json", children="Load JSONLogic"),
         html.Button(id="update-format-spel", children="Load SPEL"),
         html.Button(id="update-fields", children="update fields"),
+        html.Button(id="btn-disabled", children="Disable buttons"),
     ]
 )
+
+@app.callback(
+    Output("input", "tree"),
+    Input("update-button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def update_tree_value(n):
+    if n is not None and n % 2 == 1:
+        rv = tree
+    else:
+        rv = empty_
+    return rv
+
+@app.callback(
+    Output("input", "disabled"),
+    Input("btn-disabled", "n_clicks"),
+    # prevent_initial_call=True,
+)
+def btn_disabled(n):
+    if n is not None and n % 2 == 1:
+        return True
+    return False
+
 
 
 @app.callback(
@@ -172,10 +197,11 @@ def update_load_format(n_clicks_tree, n_clicks_json, n_clicks_spel):
         State("input", "sqlFormat"),
         State("input", "jsonLogicFormat"),
         State("input", "spelFormat"),
+        State("input", "fields"),
     ],
     prevent_initial_call=True,
 )
-def display_output(tree_value, sqlFormat, jsonLogicFormat, spelFormat):
+def display_output(tree_value, sqlFormat, jsonLogicFormat, spelFormat, fields):
     output = html.Div(
         children=[
             html.H1("tree"),
@@ -189,23 +215,13 @@ def display_output(tree_value, sqlFormat, jsonLogicFormat, spelFormat):
             html.Hr(),
             html.H1("spelFormat"),
             html.Div(spelFormat),
+            html.Hr(),
+            html.H1("fields"),
+            html.Div(str(fields)),
         ]
     )
     return output
 
-
-@app.callback(
-    Output("input", "tree"),
-    Input("update-button", "n_clicks"),
-    prevent_initial_call=True,
-)
-def update_tree_value(n):
-    if n is not None and n % 2 == 1:
-        rv = tree
-    else:
-        rv = empty_
-
-    return rv
 
 @app.callback(
     Output("input", "fields"),
